@@ -1,0 +1,1 @@
+web ansible_host=adhaff.eastus2.cloudapp.azure.com ansible_user=linuxuser ansible_ssh_pass=myNewPassword

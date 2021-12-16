@@ -1,0 +1,51 @@
+- hosts: all
+  become: yes
+  vars_files:
+    - vars/default.yaml
+  tasks:
+
+    - name: update
+      apt: update_cache=yes   
+   
+    - name: Install Nginx
+      apt: name=nginx state=latest
+    
+      notify:
+        - restart nginx
+
+    - name : Install Python Package
+      apt: name=python3 update_cache=yes state=latest 
+
+    - name : Install Let's Encrypt Package
+      apt: name={{ certbot_package }} update_cache=yes state=latest
+
+    - name: Create and Install Cert Using {{ certbot_plugin }} Plugin
+      command: "certbot --{{ certbot_plugin }} -d  {{ certbot_site_name }} -m {{ certbot_mail_address }} --agree-tos --noninteractive --redirect"
+ 
+   
+    - name: Set Letsencrypt Cronjob for Certificate Auto Renewal
+      cron: name=letsencrypt_renewal special_time=monthly job="/usr/bin/certbot renew"
+
+      notify:
+        - restart nginx
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=reloaded
+
+ certbot --nginx -d asdasd.eastus2.cloudapp.azure.com -m madhav@test.com --agree-tos --noninteractive --redirect
+
+
+class Count:
+    def __init__(self,mymin,mymax):
+        self.mymin=mymin
+        self.mymax=mymax    
+
+    def __getattr__(self, item):
+        self.__dict__[item]=0
+        return 0
+
+obj1 = Count(1,10)
+print(obj1.mymin)
+print(obj1.mymax)
+print(obj1.mycurrent1)

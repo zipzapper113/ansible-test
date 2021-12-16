@@ -1,0 +1,4 @@
+certbot_site_name: "adhaff.eastus2.cloudapp.azure.com"
+certbot_package: "python3-certbot-nginx"
+certbot_plugin: "nginx"
+certbot_mail_address: madhav@test.com

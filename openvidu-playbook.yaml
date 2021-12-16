@@ -1,0 +1,45 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Download Openvidu
+      get_url:
+          url:  https://s3-eu-west-1.amazonaws.com/aws.openvidu.io/install_openvidu_latest.sh 
+          dest: /opt
+    - name: give permissons
+      shell: chmod -R 777 /opt/
+
+    - name: Install Openvidu
+      shell: /opt/install_openvidu_latest.sh
+      args:
+        chdir: /opt
+
+    - name: Configure Openvidu
+      lineinfile:
+        path: /opt/openvidu/.env
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+          - { regexp: '^DOMAIN_OR_PUBLIC_IP', line: DOMAIN_OR_PUBLIC_IP=skghag.eastus2.cloudapp.azure.com }
+          - { regexp: '^OPENVIDU_SECRET', line: OPENVIDU_SECRET=Arvrfsa123 }
+          - { regexp: '^CERTIFICATE_TYPE', line: CERTIFICATE_TYPE=letsencrypt }
+          - { regexp: '^LETSENCRYPT_EMAIL', line: LETSENCRYPT_EMAIL=madhav@test.com }
+
+    - name: give permissons
+      shell: chmod -R 777 /opt/
+
+    - name: Start OpenVidu
+      shell: ./openvidu start
+      async: 30
+      args:
+        chdir: /opt/openvidu
+      ignore_errors: yes
+
+    - name: get container status
+      shell: docker ps -a 
+      register: status_ts
+    - debug: 
+        var: status_ts
+    
+      
+  
